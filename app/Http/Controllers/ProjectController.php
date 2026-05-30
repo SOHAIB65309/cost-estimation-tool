@@ -100,14 +100,13 @@ class ProjectController extends Controller
             'proxy_source_url' => 'required|url',
         ]);
 
-        $response = Http::post('http://127.0.0.1:8001/api/scrape', [
+        $response = Http::timeout(120)->post('http://127.0.0.1:8001/api/scrape', [
             'url' => $request->proxy_source_url,
-        ]);
+        ],);
 
         if ($response->failed()) {
             return back()->with('error', 'Failed to scrape the provided URL.');
         }
-
         $counts = $response->json()['components'] ?? ['input_forms' => 0, 'ui_components' => 0, 'action_endpoints' => 0];
 
         $project = Project::create([
