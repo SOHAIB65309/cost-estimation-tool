@@ -9,7 +9,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type DeveloperProfile, type Project, type WbsComponent } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
-import { AlertTriangle, Calculator, CheckCircle2, Gavel, HelpCircle, Info, Loader2, Lock, Plus, Users } from 'lucide-react';
+import { AlertTriangle, Calculator, CheckCircle2, Gavel, HelpCircle, Info, Loader2, Lock, Plus } from 'lucide-react';
 import React, { useState } from 'react';
 
 interface DelphiWorkspaceProps {
@@ -275,12 +275,14 @@ export default function DelphiWorkspace({ project, developers }: DelphiWorkspace
                                         
                                         // Calculate variance
                                         let highVariance = false;
+                                        let variancePercent = 0;
                                         if (voteCount >= 2) {
                                             const hours = votes.map(v => v.voted_hours);
                                             const min = Math.min(...hours);
                                             const max = Math.max(...hours);
                                             if (min > 0) {
-                                                highVariance = (max - min) / min > 0.15;
+                                                variancePercent = Math.round(((max - min) / min) * 100);
+                                                highVariance = variancePercent > 15;
                                             }
                                         }
 
@@ -291,15 +293,21 @@ export default function DelphiWorkspace({ project, developers }: DelphiWorkspace
                                                 <td className="px-6 py-4 text-center">
                                                     <div className="flex flex-col items-center gap-2">
                                                         <div className="flex justify-center -space-x-2">
-                                                            {votes.map((v, i) => (
-                                                                <div
-                                                                    key={i}
-                                                                    title={`${v.developer_name}: ${v.voted_hours}h`}
-                                                                    className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-neutral-900 bg-neutral-800 text-[10px] font-bold text-indigo-400 ring-2 ring-transparent group-hover:ring-indigo-500/20"
-                                                                >
-                                                                    {v.developer_name.substring(0, 1)}
-                                                                </div>
-                                                            ))}
+                                                            {votes.map((v, i) => {
+                                                                const isSelf = v.developer_name === auth.user.name;
+                                                                const canSeeValue = voteCount >= 2 || isSelf;
+                                                                const displayValue = canSeeValue ? `${v.voted_hours}h` : 'Hidden';
+                                                                
+                                                                return (
+                                                                    <div
+                                                                        key={i}
+                                                                        title={`${v.developer_name}: ${displayValue}`}
+                                                                        className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-neutral-900 bg-neutral-800 text-[10px] font-bold text-indigo-400 ring-2 ring-transparent group-hover:ring-indigo-500/20"
+                                                                    >
+                                                                        {v.developer_name.substring(0, 1)}
+                                                                    </div>
+                                                                );
+                                                            })}
                                                         </div>
                                                         {voteCount < 2 && (
                                                             <span className="text-[10px] text-yellow-500/70 font-medium">
@@ -315,12 +323,12 @@ export default function DelphiWorkspace({ project, developers }: DelphiWorkspace
                                                         </Badge>
                                                     ) : highVariance ? (
                                                         <Badge variant="destructive" className="bg-red-500/10 text-red-400 border-red-500/30 px-2 py-0.5 text-[10px] uppercase tracking-wider">
-                                                            Estimates Too Far Apart
+                                                            {variancePercent}% Variance
                                                         </Badge>
                                                     ) : (
                                                         <div className="flex items-center justify-center gap-1 text-green-500">
                                                             <CheckCircle2 className="h-4 w-4" />
-                                                            <span className="text-[10px] font-bold uppercase">Agreed</span>
+                                                            <span className="text-[10px] font-bold uppercase">Agreed ({variancePercent}%)</span>
                                                         </div>
                                                     )}
                                                 </td>
@@ -491,3 +499,4 @@ export default function DelphiWorkspace({ project, developers }: DelphiWorkspace
         </AppLayout>
     );
 }
+    

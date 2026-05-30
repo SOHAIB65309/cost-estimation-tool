@@ -3,8 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Project } from '@/types';
-import { Head, useForm } from '@inertiajs/react';
-import { Layers, LayoutGrid, Loader2, PlusCircle, Search } from 'lucide-react';
+import { Head, Link, useForm } from '@inertiajs/react';
+import { Eye, Layers, LayoutGrid, Loader2, PlusCircle, Search } from 'lucide-react';
 
 interface DashboardProps {
     projects: Project[];
@@ -36,7 +36,7 @@ export default function Dashboard({ projects }: DashboardProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
-            
+
             <div className="flex h-full flex-1 flex-col gap-8 p-4 md:p-8">
                 {/* Metric Cards */}
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -97,8 +97,8 @@ export default function Dashboard({ projects }: DashboardProps) {
                                 </div>
                                 {errors.proxy_source_url && <p className="text-xs text-red-500">{errors.proxy_source_url}</p>}
                             </div>
-                            <Button 
-                                type="submit" 
+                            <Button
+                                type="submit"
                                 disabled={processing}
                                 className="bg-blue-600 hover:bg-blue-500 text-white font-semibold transition-all disabled:opacity-50"
                             >
@@ -129,7 +129,7 @@ export default function Dashboard({ projects }: DashboardProps) {
                                         <th className="px-6 py-4">Proxy URL</th>
                                         <th className="px-6 py-4 text-center">Status</th>
                                         <th className="px-6 py-4 text-right">Est. Hours</th>
-                                        <th className="px-6 py-4 text-right">Action</th>
+                                        <th className="px-12 py-4 text-right">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-neutral-800">
@@ -141,16 +141,16 @@ export default function Dashboard({ projects }: DashboardProps) {
                                         </tr>
                                     ) : (
                                         projects.map((project) => (
-                                            <tr 
-                                                key={project.id} 
+                                            <tr
+                                                key={project.id}
                                                 className="group transition-colors hover:bg-neutral-800/30"
                                             >
                                                 <td className="px-6 py-4 font-medium text-white">{project.title}</td>
                                                 <td className="px-6 py-4">
                                                     {project.proxy_source_url ? (
-                                                        <a 
-                                                            href={project.proxy_source_url} 
-                                                            target="_blank" 
+                                                        <a
+                                                            href={project.proxy_source_url}
+                                                            target="_blank"
                                                             rel="noopener noreferrer"
                                                             className="text-blue-400 hover:text-blue-300 transition-colors"
                                                         >
@@ -161,11 +161,10 @@ export default function Dashboard({ projects }: DashboardProps) {
                                                     )}
                                                 </td>
                                                 <td className="px-6 py-4 text-center">
-                                                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${
-                                                        project.status === 'Completed' || project.status === 'Locked'
-                                                        ? 'bg-green-500/10 text-green-400 ring-green-500/20' 
+                                                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${project.status === 'Completed' || project.status === 'Locked'
+                                                        ? 'bg-green-500/10 text-green-400 ring-green-500/20'
                                                         : 'bg-yellow-500/10 text-yellow-400 ring-yellow-500/20'
-                                                    }`}>
+                                                        }`}>
                                                         {project.status}
                                                     </span>
                                                 </td>
@@ -173,14 +172,22 @@ export default function Dashboard({ projects }: DashboardProps) {
                                                     {project.final_estimated_hours ?? '---'}h
                                                 </td>
                                                 <td className="px-6 py-4 text-right">
-                                                    <Button 
-                                                        variant="ghost" 
-                                                        size="sm" 
+                                                    <Link
+                                                        href={route('projects.show', project.id)}
+                                                        className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-neutral-400 transition-colors hover:bg-indigo-500/10 hover:text-indigo-400"
+                                                        title="View Project Details"
+                                                    >
+                                                        <Eye className="h-5 w-5" />
+                                                    </Link>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
                                                         asChild
                                                         className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/10"
                                                     >
                                                         <a href={route('projects.delphi', project.id)}>Delphi Room</a>
                                                     </Button>
+
                                                 </td>
                                             </tr>
                                         ))

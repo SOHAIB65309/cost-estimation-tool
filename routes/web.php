@@ -17,6 +17,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('team', DeveloperProfileController::class)->except(['create', 'show', 'edit']);
 
     Route::post('projects', [ProjectController::class, 'store'])->name('projects.store');
+    Route::get('projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
     Route::get('projects/{project}/delphi', [ProjectController::class, 'delphi'])->name('projects.delphi');
     Route::post('projects/{project}/lock', [ProjectController::class, 'lockConsensus'])->name('projects.lock');
     Route::post('projects/{project}/components', [ProjectController::class, 'addManualComponent'])->name('projects.components.store');

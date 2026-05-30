@@ -43,6 +43,7 @@ export interface DelphiVote {
 
 export interface DeveloperProfile {
     id: number;
+    user_id: number;
     name: string;
     role: string;
     weekly_loc_capacity: number;

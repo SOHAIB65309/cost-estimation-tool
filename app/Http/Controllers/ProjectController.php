@@ -9,12 +9,23 @@ use App\Services\EstimationEngine;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class ProjectController extends Controller
 {
+    /**
+     * Display the specified project.
+     */
+    public function show(Project $project): Response
+    {
+        $project->load('wbsComponents.delphiVotes');
+
+        return Inertia::render('project/show', [
+            'project' => $project,
+        ]);
+    }
+
     /**
      * Finalize the Delphi consensus and lock the project.
      */
@@ -54,7 +65,7 @@ class ProjectController extends Controller
                 'best_case_hours' => $avgBest,
                 'most_likely_hours' => $avgMost,
                 'worst_case_hours' => $avgWorst,
-                'computed_pert_effort' => $finalComponentEffort
+                'computed_pert_effort' => $finalComponentEffort,
             ]);
         }
         $project->update([
@@ -114,7 +125,7 @@ class ProjectController extends Controller
         foreach ($mapping as $key => $type) {
             WbsComponent::create([
                 'project_id' => $project->id,
-                'name' => "Scraped {$type}s (Count: " . ($counts[$key] ?? 0) . ")",
+                'name' => "Scraped {$type}s (Count: ".($counts[$key] ?? 0).')',
                 'component_type' => $type,
                 'best_case_hours' => 0,
                 'most_likely_hours' => 0,
@@ -125,13 +136,14 @@ class ProjectController extends Controller
 
         return redirect()->route('dashboard')->with('success', 'Project created. Components awaiting Delphi voting.');
     }
+
     /**
      * Add a manual component to the project.
      */
     public function addManualComponent(Request $request, Project $project, EstimationEngine $engine): RedirectResponse
     {
         // Ensure project is loaded (handles cases where Route Model Binding might be skipped in tests)
-        if (!$project->exists && $request->route('project')) {
+        if (! $project->exists && $request->route('project')) {
             $project = Project::findOrFail($request->route('project'));
         }
 
