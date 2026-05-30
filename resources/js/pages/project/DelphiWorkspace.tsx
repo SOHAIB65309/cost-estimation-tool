@@ -227,10 +227,10 @@ export default function DelphiWorkspace({ project, developers }: DelphiWorkspace
                 </Card>
 
                 {/* Consensus Error Alert */}
-                {lockForm.errors.consensus && (
+                {(lockForm.errors as any)?.consensus && (
                     <div className="flex items-center gap-3 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-red-400 animate-in fade-in slide-in-from-top-4">
                         <AlertTriangle className="h-5 w-5" />
-                        <p>{lockForm.errors.consensus}</p>
+                        <p>{(lockForm.errors as any).consensus}</p>
                     </div>
                 )}
 
